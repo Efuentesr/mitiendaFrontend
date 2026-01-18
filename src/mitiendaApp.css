@@ -1,0 +1,158 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.menu-fixed {
+  flex-shrink: 0; /* Evita que el menú se reduzca */
+}
+
+.content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+}
+/* Scrollbar estilizada solo para esta sección */
+.content-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.content-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-scrollable {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+
+.my-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.my-container.my-container-sm {
+  max-width: 782px;
+}
+.my-header {
+  animation: fadeInHeader 1s ease-in-out;
+  flex-direction: column;
+  /* text-align: center; */
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+.my-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+ 
+  /* box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); */
+  box-shadow: 0 0.2rem 1rem rgba(0,0,255, 0.15);
+  /* border: solid 3px rgb(199, 197, 197); */
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.my-card-body {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+.my-key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding-bottom: 1rem; 
+}
+
+
+/* a cambiar */
+.prd-card {
+  border: 1px solid #d5d9d9;
+  width: 18rem;
+  height: 31rem;
+  border-radius: 6px;
+}
+
+.prd-card-detail {
+  height: 27rem;
+}
+
+.prd-card-img {
+  /* height: 18rem;   */
+  height: 18rem;  
+  font-size: 11.2px;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 12px;
+}
+img {
+  mix-blend-mode: multiply;
+}
+
+.prd-img {
+  max-height: 17rem;
+  max-width: 17rem;
+  width: 100%; 
+  height: 100%;
+  object-fit: contain;
+}
+.prd-card-descr {
+  height: 10rem;
+  display: flex;
+  flex-direction: column;
+}
+.prd-summary {
+  height: 3.12rem;
+  font-size: 0.8rem;
+  margin: 1rem 0.8rem;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3em;
+  padding: 0px 12px;
+}
+
+.arrow-class{
+  font-size: 30px;
+  font-weight: 600; 
+  color: orange;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+.fill-filter{
+  font-size: 30px;
+  font-weight: 600; 
+  color: orange;
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 100;
+}
+#mostrar-filtro-fijo {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
