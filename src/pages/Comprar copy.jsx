@@ -10,17 +10,15 @@ const Comprar = () => {
   const { cartProducts, setCartProducts } = useContext(AuthContext);
   const [showFiltro, setShowFiltro] = useState(false);
   
+  // Usar searchParams para persistir en URL
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [productsWF, setProductsWF] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   
-  // Leer TODO directamente de la URL (single source of truth)
+  // Leer página actual de la URL
   const currentPage = parseInt(searchParams.get('page')) || 1;
-  const filterName = searchParams.get('name') || '';
-  const filterCategory = searchParams.get('category') || '';
-  const pageSize = 10;
   
   const [pagination, setPagination] = useState({
       count: 0,
@@ -29,16 +27,36 @@ const Comprar = () => {
       totalPages: 1
   });
 
-  const fetchProducts = async () => {
+  // Leer filtros de la URL también
+  const [filters, setFilters] = useState({
+      name: searchParams.get('name') || '',
+      category: searchParams.get('category') || '',
+      page_size: 10
+  });
+
+  // Actualizar URL cuando cambia página o filtros
+  const updateURL = (page, name, category) => {
+      const params = new URLSearchParams();
+      console.log('en updateURL newpage, name, category: ', page,"-", name, "-", category)
+      params.set('page', page.toString());
+      
+      
+      if (name) params.set('name', name);
+      if (category) params.set('category', category);
+      console.log('params: ', params)
+      setSearchParams(params);
+  };
+
+  const fetchProducts = async (page = 1) => {
       setLoading(true);
       try {
           const params = new URLSearchParams({
-              page: currentPage,
-              page_size: pageSize
+              page: page,
+              page_size: filters.page_size
           });
           
-          if (filterName) params.append('name', filterName);
-          if (filterCategory) params.append('category', filterCategory);
+          if (filters.name) params.append('name', filters.name);
+          if (filters.category) params.append('category', filters.category);
 
           const response = await api.get("api/Product/?" + params);
           const data = response.data;
@@ -49,7 +67,7 @@ const Comprar = () => {
               count: data.count,
               next: data.next,
               previous: data.previous,
-              totalPages: Math.ceil(data.count / pageSize)
+              totalPages: Math.ceil(data.count / filters.page_size)
           });
       } catch (error) {
           console.error('Error fetching products:', error);
@@ -63,7 +81,8 @@ const Comprar = () => {
       try {
           const response = await api.get("api/Category/");
           const data = response.data;
-          // console.log('fetch categories response.data: ', response.data);
+          console.log('fetch categories response.data: ', response.data);
+
           setCategories(data);
       } catch (error) {
           console.error('Error fetching categories:', error);
@@ -72,32 +91,35 @@ const Comprar = () => {
       }
   };
 
-  // Solo depende de los valores de la URL
   useEffect(() => {
-      fetchProducts();
-  }, [currentPage, filterName, filterCategory]);
-
-  useEffect(() => {
-      fetchCategories();
-  }, []);
+      fetchProducts(currentPage);
+  }, [currentPage, filters.name, filters.category, filters.page_size]);
 
   const handlePageChange = (page) => {
+    console.log('handle page change')
       if (page >= 1 && page <= pagination.totalPages) {
-          const params = new URLSearchParams();
-          params.set('page', page.toString());
-          if (filterName) params.set('name', filterName);
-          if (filterCategory) params.set('category', filterCategory);
-          setSearchParams(params);
+          updateURL(page, filters.name, filters.category);
       }
   };
 
-  // Función para aplicar filtros - solo actualiza la URL
-  const handleApplyFilters = (name, category) => {
-      const params = new URLSearchParams();
-      params.set('page', '1'); // Siempre resetear a página 1
-      if (name) params.set('name', name);
-      if (category && category.length > 0) params.set('category', category.toString());
-      setSearchParams(params);
+  const handleFilterChange = (e) => {
+      const { name, value } = e.target;
+      const newFilters = { ...filters, [name]: value };
+      setFilters(newFilters);
+      updateURL(1, newFilters.name, newFilters.category);
+  };
+
+  const myHandleFilterChange = () => {
+    // console.log('myFilterChange');
+    // updateURL(1, textSearch, selectedCategories);
+    handlePageChange(1);
+    return
+    setFilters({
+        name: textSearch,
+        category: categorias,
+        page_size: 10
+    });
+      updateURL(1, textSearch, categorias);
   };
 
   const renderPaginationItems = () => {
@@ -149,6 +171,9 @@ const Comprar = () => {
 
       return items;
   };
+  useEffect(() => {
+      fetchCategories();
+  }, []);
 
   return (
     <div className="container">
@@ -170,20 +195,31 @@ const Comprar = () => {
             product={product}
             indice={i}
             cartProducts={cartProducts}
-            setCartProducts={setCartProducts}
+            setSearchParams={setSearchParams}
           />
         ))}
       </div>
 
-      {showFiltro && (
+      {showFiltro && 
         <Filtro 
-          setShowFiltro={setShowFiltro} 
-          categories={categories}
-          onApplyFilters={handleApplyFilters}
-          initialName={filterName}
-          initialCategory={filterCategory}
+            setShowFiltro={setShowFiltro} 
+            categories={categories}
+            onApplyFilters={(name, category) => {
+              // Actualizar filtros
+              setFilters({
+                name: name,
+                category: category,
+                page_size: 10
+              });
+              // Resetear a página 1
+              const params = new URLSearchParams();
+              params.set('page', '1');
+              if (name) params.set('name', name);
+              if (category && category.length > 0) params.set('category', category.toString());
+              setSearchParams(params);
+            }}
         />
-      )}
+      }
 
       {/* Paginación */}
       {pagination.totalPages > 1 && (

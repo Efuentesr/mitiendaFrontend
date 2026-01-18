@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { BsFillFilterSquareFill } from "react-icons/bs";
 import { useSearchParams } from 'react-router-dom';
 import Product from './Product.jsx';
@@ -42,7 +42,6 @@ const Comprar = () => {
 
           const response = await api.get("api/Product/?" + params);
           const data = response.data;
-          // console.log('fetch products response.data: ', response.data);
 
           setProductsWF(data.results);
           setPagination({
@@ -59,20 +58,15 @@ const Comprar = () => {
   };
 
   const fetchCategories = async () => {
-      setLoading(true);
       try {
           const response = await api.get("api/Category/");
-          const data = response.data;
-          // console.log('fetch categories response.data: ', response.data);
-          setCategories(data);
+          setCategories(response.data);
       } catch (error) {
           console.error('Error fetching categories:', error);
-      } finally {
-          setLoading(false);
       }
   };
 
-  // Solo depende de los valores de la URL
+  // Un solo useEffect que depende de los valores de la URL
   useEffect(() => {
       fetchProducts();
   }, [currentPage, filterName, filterCategory]);
@@ -151,19 +145,28 @@ const Comprar = () => {
   };
 
   return (
-    <div className="container">
-      <BsFillFilterSquareFill className="fill-filter" onClick={() => setShowFiltro(true)} />
+    <div className="container-fluid px-2 px-md-4">
+      {/* Botón de filtro */}
+      <button 
+        className="btn btn-warning position-fixed d-flex align-items-center gap-2 shadow"
+        style={{ top: "70px", right: "15px", zIndex: 100 }}
+        onClick={() => setShowFiltro(true)}
+      >
+        <BsFillFilterSquareFill size={20} />
+        <span className="d-none d-sm-inline">Filtrar</span>
+      </button>
 
       {/* Loading indicator */}
       {loading && (
-        <div className="text-center py-3">
-          <div className="spinner-border" role="status">
+        <div className="text-center py-4">
+          <div className="spinner-border text-success" role="status">
             <span className="visually-hidden">Cargando...</span>
           </div>
         </div>
       )}
 
-      <div className='container-fluid row justify-content-around' style={{ overflowY: "auto" }}>
+      {/* Grid de productos */}
+      <div className="row g-3 mt-2">
         {productsWF.map((product, i) => (
           <Product
             key={product.code}
@@ -175,26 +178,34 @@ const Comprar = () => {
         ))}
       </div>
 
-      {showFiltro && (
-        <Filtro 
-          setShowFiltro={setShowFiltro} 
-          categories={categories}
-          onApplyFilters={handleApplyFilters}
-          initialName={filterName}
-          initialCategory={filterCategory}
-        />
+      {/* Mensaje cuando no hay productos */}
+      {!loading && productsWF.length === 0 && (
+        <div className="text-center py-5">
+          <p className="text-muted">No se encontraron productos</p>
+        </div>
       )}
+
+      {showFiltro && (
+          <Filtro 
+            setShowFiltro={setShowFiltro} 
+            categories={categories}
+            onApplyFilters={handleApplyFilters}
+            initialName={filterName}
+            initialCategory={filterCategory}
+          />
+        )}
 
       {/* Paginación */}
       {pagination.totalPages > 1 && (
-          <nav aria-label="Navegación de productos">
-              <ul className="pagination justify-content-center">
+          <nav aria-label="Navegación de productos" className="mt-4 mb-3">
+              <ul className="pagination pagination-sm justify-content-center flex-wrap">
                   <li className={`page-item ${!pagination.previous ? 'disabled' : ''}`}>
                       <button
                           className="page-link"
                           onClick={() => handlePageChange(currentPage - 1)}
                       >
-                          Anterior
+                          <span className="d-none d-sm-inline">Anterior</span>
+                          <span className="d-sm-none">«</span>
                       </button>
                   </li>
                   
@@ -205,7 +216,8 @@ const Comprar = () => {
                           className="page-link"
                           onClick={() => handlePageChange(currentPage + 1)}
                       >
-                          Siguiente
+                          <span className="d-none d-sm-inline">Siguiente</span>
+                          <span className="d-sm-none">»</span>
                       </button>
                   </li>
               </ul>

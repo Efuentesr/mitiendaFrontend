@@ -1,40 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const Filtro = ({setShowFiltro, categories, onApplyFilters, initialName = '', initialCategory = ''}) => {
-    // Inicializar con valores actuales de la URL
-    const [selectedCategories, setSelectedCategories] = useState(() => {
-        if (initialCategory) {
-            // Convertir string "109,110" a array de números [109, 110]
-            return initialCategory.split(',').map(Number).filter(n => !isNaN(n));
-        }
-        return [];
-    });
-    const [searchText, setSearchText] = useState(initialName);
 
-    const handleTextChange = (event) => {
+const Filtro = ({setShowFiltro, categories, onApplyFilters }) => {
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [searchText ,setSearchText] = useState('');
+
+    const handleTextChange = (event) =>{
         setSearchText(event.target.value);
     }
-    
     const handleCheckboxChange = (id) => {
         setSelectedCategories((prevSelected) => {
-            const isSelected = prevSelected.includes(id);
-            return isSelected
-                ? prevSelected.filter((c) => c !== id)
-                : [...prevSelected, id];
+          const isSelected = prevSelected.includes(id);
+          const updatedSelection = isSelected
+            ? prevSelected.filter((c) => c !== id)
+            : [...prevSelected, id];
+    
+          handleFilterChange(updatedSelection);
+          return updatedSelection;
         });
     }
 
-    const selectProducts = () => {
-        setShowFiltro(false);
-        onApplyFilters(searchText, selectedCategories);
-    }
+    const handleFilterChange = (selectedCategories) => {
+        console.log("id selected:", selectedCategories);
+    };
 
-    const clearFilters = () => {
-        setSearchText('');
-        setSelectedCategories([]);
+    const selectProducts = () => {
+        
+        setShowFiltro(false);
+        // Llamar al callback del padre con los filtros seleccionados
+        onApplyFilters(searchText, selectedCategories);
+
     }
     
     return (
+        // CORREGIDO: Modal responsivo con overlay y dimensiones adaptables
         <>
             {/* Overlay oscuro */}
             <div 
@@ -108,13 +107,6 @@ const Filtro = ({setShowFiltro, categories, onApplyFilters, initialName = '', in
                         onClick={selectProducts}
                     >
                         Aplicar Filtros
-                    </button>
-                    <button 
-                        className="btn btn-outline-warning" 
-                        onClick={clearFilters}
-                        title="Limpiar filtros"
-                    >
-                        Limpiar
                     </button>
                     <button 
                         className="btn btn-outline-secondary" 

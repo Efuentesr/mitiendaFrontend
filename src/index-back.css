@@ -4,8 +4,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: #213547;
-  background-color: #ffffff;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -22,34 +22,17 @@ a:hover {
   color: #535bf2;
 }
 
-/* CORREGIDO: Removido place-items: center que causaba problemas de layout */
 body {
   margin: 0;
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
 h1 {
-  font-size: 2rem;
+  font-size: 3.2em;
   line-height: 1.1;
-}
-
-/* Responsive heading */
-@media (min-width: 768px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-}
-
-@media (min-width: 992px) {
-  h1 {
-    font-size: 3.2em;
-  }
 }
 
 button {
@@ -59,30 +42,16 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
+  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-
+button:hover {
+  border-color: #646cff;
+}
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #1a1a1a;
-  }
-  button:hover {
-    border-color: #646cff;
-  }
 }
 
 @media (prefers-color-scheme: light) {

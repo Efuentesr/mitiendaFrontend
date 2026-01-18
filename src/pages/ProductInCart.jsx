@@ -6,6 +6,7 @@ import ConfirmButton from "../components/ConfirmButton";
 const ProductInCart = ({product, indice, cartProducts, setCartProducts}) => {
     const [showModal, setShowModal] = useState(false);
 
+    const code = product["code"];
     const image = product["image"];
     const description = product["name"]; 
     const price = `$${product["price"]}`;
@@ -64,6 +65,7 @@ const ProductInCart = ({product, indice, cartProducts, setCartProducts}) => {
                 </div>
 
                 <div className="col-12 col-md-3">
+                    <div className="fw-bold mt-2">{code}</div>
                     <div className="fw-semibold">{description}</div>
                     <div className="fw-bold mt-2">Unit Price: {price}</div>
                 </div>
