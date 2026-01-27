@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
 import { AuthContext } from "../context/AuthContext";
 import { ACCESS_TOKEN } from "../services/constants"
-import axios from "axios";
+import api from "../services/api"
 import ToastAlert from '../components/ToastAlert';
 import { userRegistration } from "../services/userService";
 import { crearOActualizarComprador } from "../services/compradorService";
@@ -44,24 +44,15 @@ const RegisterUser = () => {
     }
 
     const workSubmit = async (data) => {
-      const dataForCompProv = {
-        username: data.username,
-        email: data.email,
-        first_name: data.first_name,
-        last_name: data.last_name,      
-      }
-      
-      let cancelar = await verIfUserExists(data);
-      if (cancelar){
+      console.log("entrando a onSubmit...")
+      let existe = await verIfUserExists(data);
+      if (existe){
         reset()
         return
       }
       try 
       {
-        await userRegistration(react_url, data);        
-        const token = localStorage.getItem("access");
-        console.log( " enviando token: ", token);
-        await fetchUser(token)
+        await userRegistration(data);
         console.log("registro de usuario completado on exito")
         navigate("/")
       } catch (err) {
@@ -75,18 +66,8 @@ const RegisterUser = () => {
     }
 
     const verIfUserExists = async (data) => {
-      const route = react_url + "api/check-user-exists/" ;
-      const response = await axios.post(
-        route,
-        { username: data.username, },
-        { headers: { "Content-Type": "application/json",}, }
-      );
-      let cancelar = false
-      if (response.data["user_exists"]) {
-        console.log("Error: Usuario ya existe")
-        cancelar = true
-      }
-      return cancelar
+      const response = await api.get(`api/check-username/?username=${data.username}`);
+      return response.data.user_exists
     } 
 
     return(
@@ -108,6 +89,7 @@ const RegisterUser = () => {
                     <input
                       type="text"
                       id="username"
+                      name="username"
                       className="form-control"
                       placeholder="Ingrese su usuario"
                       {...register("username", {
@@ -115,6 +97,16 @@ const RegisterUser = () => {
                             value: true,
                             message: "Usuario es requerido"
                           },
+                          validate: async (value) => {
+                            const response = await api.get("api/check-username/?username="+value);
+                            console.log("usuario existe: ",response.data)
+                            if (response.data.exists) {
+                              return("Usuario ya existe !!! ")
+                            }else {
+                              return !response.data.exists;
+                            }
+                          }
+
                         })
                       }
                     />
@@ -129,13 +121,14 @@ const RegisterUser = () => {
                       type="email"
                       id="email"
                       size={40}
+                      name="email"
                       className="form-control"
                       // placeholder="Ingrese su email"
                       {...register("email", {
                           required: {
                             value: true,
                             message: "email es requerido"
-                          }
+                          },
                         })
                       }
                     />
@@ -149,6 +142,7 @@ const RegisterUser = () => {
                     <input
                       type="password"
                       id="password"
+                      name="password"
                       className="form-control"
                       // placeholder="Ingrese su password"
                       {...register("password", {
@@ -169,6 +163,7 @@ const RegisterUser = () => {
                       type="password"
                       id="password2"
                       className="form-control"
+                      name="password2"
                       // placeholder="Re-ingrese su password"
                       {...register("password2", {
                           required: {
@@ -191,34 +186,23 @@ const RegisterUser = () => {
                     }
                   </div>
 
-                  <div className="form-group rol">
-                    <label htmlFor="rol" >Rol</label>
-                    <select
-                      id="rol"
-                      className="form-control"
-                      // disabled={!modificar}
-                      {...register("rol", {
-                          required: {
-                            value: true,
-                            message: "Rol es requerido"
-                          },
-                        })
-                      }
-                    >
-                      <option value="">Seleccione Rol </option>
-                      {/* <option value="admin">Admin</option> */}
-                      <option value="comprador">Comprador</option>
-                      <option value="proveedor">Proveedor</option>
-                    </select>
-                    {
-                      errors.rol && <span style={{color: "red", fontSize:"0.8rem"}} >{errors.rol.message}</span>
-                    }
+                  <div className="form-group is_provider">
+                    
+                    <input 
+                      type="checkbox" 
+                      id="is_provider" 
+                      name="is_provider" 
+                      className="my-3"
+                      {...register("is_provider") }
+                    />
+                    <label htmlFor="is_provider" className="ms-2" >Proveedor </label>
                   </div>
                   <div className="form-group first_name">
                     <label id="first_nameLbl" htmlFor="first_name">Nombre</label>
                     <input
                       type="text"
                       id="first_name"
+                      name="first_name"
                       className="form-control"
                       // readOnly={!modificar}
                       // placeholder="Ingrese su nombre"
@@ -239,6 +223,7 @@ const RegisterUser = () => {
                     <input
                       type="text"
                       id="last_name"
+                      name="last_name"
                       className="form-control"
                       // readOnly={!modificar}
                       {...register("last_name", {

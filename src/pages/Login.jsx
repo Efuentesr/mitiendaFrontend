@@ -30,6 +30,10 @@ const Login = () => {
       } finally {
         setIsLoading(false);
       }
+    };
+
+    const goToRegister = () => {
+            navigate("/registerUser");
     }
 
     return(
@@ -47,6 +51,7 @@ const Login = () => {
                       type="text"
                       // name="email"
                       id="username"
+                      name="username"
                       className="form-control"
                       placeholder="Ingrese su usuario"
                       {...register("username", {
@@ -66,7 +71,7 @@ const Login = () => {
                     <label id="passwordLbl" htmlFor="password">Password</label>
                     <input
                       type="password"
-                      // name="password"
+                      name="password"
                       id="password"
                       className="form-control"
                       placeholder="Ingrese su password"
@@ -82,8 +87,19 @@ const Login = () => {
                   {
                       errors.password && <span style={{color: "red", fontSize:"0.8rem"}} >{errors.password.message}</span>
                   }
-                  <div className="form-group text-center mt-2">
+                  <div className="d-flex" >
+                  <div className="form-group text-center mt-2 me-2">
                       <button name="login" className="btn btn-success" type="submit">Iniciar Sesion</button>
+                  </div>
+                  <div className="form-group text-center mt-2">
+                      <button 
+                        name="register" 
+                        className="btn btn-secondary" 
+                        onClick={goToRegister}
+                      >
+                        Registrarse
+                      </button>
+                  </div>
                   </div>
                 </form>
               </div>
